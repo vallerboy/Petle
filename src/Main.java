@@ -1,50 +1,104 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.*;
+
 /**
  * Created by Lenovo on 22.06.2017.
  */
-public class Main {
-    public static void main(String[] args) {
+public class Main extends JFrame {
 
-        // Pętla ta będzie wykonywać się dopóty warunek zwraca true czyli prawdę
-        int counter = 0;
-        while (counter <= 10) {
-                System.out.println("While");
-                counter++;
-        }
+    private java.util.List<Question> questionList = new ArrayList<>();
+    private JButton buttonYes;
+    private JButton buttonNo;
+    private JLabel labelQuestion;
 
-        //Do while
-        int counterDoWhile = 12;
-        do{
-            System.out.println("Do while");
-            counterDoWhile++;
-        }while (counterDoWhile <= 10);
+    private int activeQuestion;
+    private int points;
+
+    public Main() {
+        super("Milionerzy");
+        this.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        setSize(500, 500);
+        setLayout(new GridLayout(3, 1));
+        setResizable(false);
+
+        labelQuestion = new JLabel("Kliknij 'tak', aby rozpoczac", SwingConstants.CENTER);
+        buttonNo = new JButton("Nie");
+        buttonYes = new JButton("Tak");
+
+        labelQuestion.setFont(new Font("Serif", Font.BOLD, 32));
 
 
-        //break  - przerywa działanie petli
-        //continue - przerywa wykonanie poszególnego obrotu i wraca do warunku
-        for (int i = 400; i <= 500; i++) {
-            if(i == 450){
-                break;
+        add(labelQuestion);
+        add(buttonNo);
+        add(buttonYes);
+
+
+        buttonNo.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                clickNo();
             }
-            System.out.println("Liczmy: " + i);
-        }
+        });
 
-        String[] tablicaArray = new String[4];
-        tablicaArray[0] = "pierwsza";
-        tablicaArray[1] = "druga";
-        tablicaArray[2] = "trzecia";
-        tablicaArray[3] = "czwarta";
+        buttonYes.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                clickYes();
+            }
+        });
 
-        // pętla klasyczna for
-        for(int i = 0; i < tablicaArray.length; i++){
-            System.out.println(tablicaArray[i]);
-        }
+        generateQuestions();
 
-        //pętla for each
-        for(String text : tablicaArray) {
-            System.out.println(text);
-        }
+        start();
 
-        System.out.println("To powinno wykonać się po pętli!");
+        setVisible(true);
 
     }
+
+    private void generateQuestions() {
+        questionList.add(new Question("Czy Kanada leży w europie?", true,false));
+        questionList.add(new Question("Czy europa to kontynent?", false,true));
+    }
+
+    private void start() {
+        labelQuestion.setText(questionList.get(activeQuestion).getQuestionText());
+        points = 0;
+    }
+
+    private void clickNo(){
+        if(questionList.get(activeQuestion).isNoCorrect()){
+            points++;
+        }
+        nextQueston();
+    }
+
+    private void clickYes() {
+        if(questionList.get(activeQuestion).isYesCorrect()){
+            points++;
+        }
+        nextQueston();
+    }
+
+    private void nextQueston() {
+        activeQuestion ++;
+        if(activeQuestion >= questionList.size()){
+            end();
+            return;
+        }
+        labelQuestion.setText(questionList.get(activeQuestion).getQuestionText());
+    }
+
+    private void end() {
+        JOptionPane.showMessageDialog(this, "Koniec gry~! Zdobyłeś/aś: " + points + " puntków");
+    }
+
+    public static void main(String[] args) {
+        new Main();
+    }
+
+
 }
